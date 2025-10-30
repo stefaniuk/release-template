@@ -1,0 +1,16 @@
+{
+  "name": "notify-msteams-action",
+  "version": "0.0.0-development",
+  "scripts": {
+    "build": "tsc",
+    "package": "ncc build src/main.ts -o dist",
+    "release": "semantic-release"
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.0.5",
+    "@semantic-release/release-notes-generator": "^12.0.0",
+    "semantic-release": "^23.0.0"
+  }
+}
