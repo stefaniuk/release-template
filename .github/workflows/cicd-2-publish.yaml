@@ -1,9 +1,13 @@
-name: "CI/CD release"
+name: "CI/CD publish"
 
 on:
   push:
     branches:
-      - "main"
+      - main
+  pull_request:
+    types: [closed]
+    branches:
+      - main
 
 permissions:
   contents: write
