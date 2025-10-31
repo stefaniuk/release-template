@@ -1,75 +1,68 @@
-name: "CI/CD pull request"
+name: "CI/CD release"
 
 on:
   push:
     branches:
-      - "**"
-  pull_request:
-    types: [opened, reopened]
+      - "main"
 
 permissions:
-  contents: read
-  pull-requests: write
+  contents: write
   issues: write
-  id-token: write
+  pull-requests: write
 
 jobs:
-  metadata:
-    name: "Set CI/CD metadata"
+  release:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
-    outputs:
-      build_datetime: ${{ steps.variables.outputs.build_datetime }}
-      build_timestamp: ${{ steps.variables.outputs.build_timestamp }}
-      version: ${{ steps.variables.outputs.version }}
-      does_pull_request_exist: ${{ steps.pr_exists.outputs.does_pull_request_exist }}
     steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: "Set up Node.js"
-        uses: actions/setup-node@v4
-        with:
-          node-version: 16
-          cache: npm
-      - name: "Install dependencies"
-        run: npm ci
-      - name: "Build action bundle (dry-run context)"
-        run: npm run package
       - name: "Generate GitHub App token"
         uses: actions/create-github-app-token@v2
         id: app-token
         with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ vars.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
       - name: "Mask GitHub App token"
         run: echo "::add-mask::${{ steps.app-token.outputs.token }}"
-      - name: "Semantic Release (dry run)"
-        uses: cycjimmy/semantic-release-action@v4.1.1
-        id: semantic
+
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
         with:
-          dry_run: true
+          fetch-depth: 0
+          token: ${{ steps.app-token.outputs.token }}
+          persist-credentials: false
+
+      - name: "Import commit signing key"
+        env:
+          BOT_NAME: ${{ vars.GIT_SIGN_BOT_NAME }}
+          BOT_EMAIL: ${{ vars.GIT_SIGN_BOT_EMAIL }}
+          BOT_GPG_PKEY: ${{ secrets.GIT_SIGN_BOT_GPG_PRIVATE_KEY }}
+          BOT_GPG_PASS: ${{ secrets.GIT_SIGN_BOT_GPG_PASSPHRASE }}
+        run: |
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          export GPG_TTY=$(tty)
+          echo "$BOT_GPG_PKEY" | gpg --batch --import
+          key_id=$(gpg --batch --list-secret-keys --with-colons | awk -F: '/^sec:/ {print $5; exit}')
+          git config --global user.name "$BOT_NAME"
+          git config --global user.email "$BOT_EMAIL"
+          git config --global user.signingkey "$key_id"
+          git config --global gpg.program gpg
+          git config --global commit.gpgsign true
+          git config --global tag.gpgSign true
+          if [ -n "$BOT_GPG_PASS" ]; then
+            gpgconf --kill gpg-agent || true
+            gpgconf --launch gpg-agent || true
+            echo "warmup" | gpg --batch --yes --passphrase "$BOT_GPG_PASS" --pinentry-mode loopback --sign >/dev/null 2>&1 || true
+          fi
+
+      - name: "Run Semantic Release"
+        uses: cycjimmy/semantic-release-action@v4
+        with:
           extra_plugins: |
+            @semantic-release/changelog
             @semantic-release/git
-            @semantic-release/npm
+            @semantic-release/github
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
-      - name: "Set CI/CD variables"
-        id: variables
-        run: |
-          datetime=$(date -u +'%Y-%m-%dT%H:%M:%S%z')
-          echo "build_datetime=$datetime" >> $GITHUB_OUTPUT
-          echo "build_timestamp=$(date --date=$datetime -u +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
-          echo "version=${{steps.semantic.outputs.new_release_version}}" >> $GITHUB_OUTPUT
-      - name: "Check if pull request exists"
-        id: pr_exists
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          branch_name=${GITHUB_HEAD_REF:-$(echo $GITHUB_REF | sed 's#refs/heads/##')}
-          if gh pr list --head $branch_name | grep -q .; then
-            echo "does_pull_request_exist=true" >> $GITHUB_OUTPUT
-          else
-            echo "does_pull_request_exist=false" >> $GITHUB_OUTPUT
-          fi
