@@ -203,13 +203,13 @@ If an on-disk changelog is ever needed (e.g. for packaged distributions), re-ena
 1. Create a branch and commit changes using Conventional Commits, for example:
 
    ```plaintext
-   feat(api): add user authentication
+   feat(ui): add user authentication
    ```
 
 2. Open a Pull Request and merge it into `main`, ensure that the commit created as an effect of merging this PR contains the above message as this drives the sematic versioning
 3. The workflow will:
 
-   - Detect that the change type is `feat` → trigger a **minor** version bump
+   - Detect that the change type is `feat` → trigger a _minor_ version bump
    - Update the `VERSION` file
    - Commit and tag the new release
    - Publish release notes automatically
@@ -218,14 +218,14 @@ You'll see the new tag and release appear on GitHub, both signed and verified (c
 
 ### How Conventional Commits affect versioning
 
-| Type              | Example                                  | Release bump | Explanation                                                                                                 |
+| Type              | Example                                  | Version bump | Explanation                                                                                                 |
 | ----------------- | ---------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------- |
 | `docs`            | `docs(readme): update section`           | no bump      | Documentation-only change, does not affect the application's behaviour or API                               |
 | `style`           | `style(css): normalise headings`         | no bump      | Code style or formatting change (e.g. whitespace, lint fixes) - no functional impact                        |
 | `chore`           | `chore(release): housekeeping`           | no bump      | Maintenance or tooling updates unrelated to user-facing code                                                |
 | `test`            | `test(ci): add smoke tests`              | no bump      | Adds or modifies tests, does not change runtime or API behaviour                                            |
 | `refactor`        | `refactor(ci): simplify logic`           | patch        | Code improvement or cleanup without changing behaviour, treated like a small fix                            |
+| `perf`            | `perf(core): improve runtime`            | patch        | Performance enhancement without altering external behaviour, treated as a fix                               |
 | `fix`             | `fix(ci): correct signing config`        | patch        | Corrects an existing issue, triggers a patch version bump (`x.y.z → x.y.(z+1)`)                             |
-| `perf`            | `perf(core): improve runtime`            | patch        | Performance enhancement without altering external behaviour, treated as a patch                             |
 | `feat`            | `feat(ci): add exec plugin`              | minor        | Introduces a new, backward-compatible feature, triggers a minor version bump (`x.y.z → x.(y+1).0`)          |
 | `<type>[scope]!:` | `feat(api)!: remove deprecated endpoint` | major        | Introduces a breaking change (non-backward-compatible), triggers a major version bump (`x.y.z → (x+1).0.0`) |

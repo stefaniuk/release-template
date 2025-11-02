@@ -10,6 +10,14 @@
         "preset": "conventionalcommits",
         "releaseRules": [
           {
+            "type": "refactor",
+            "release": "patch"
+          },
+          {
+            "type": "perf",
+            "release": "patch"
+          },
+          {
             "type": "fix",
             "release": "patch"
           },
