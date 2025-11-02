@@ -94,9 +94,8 @@ jobs:
         if: steps.release.outputs.new_release_published == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
           VERSION: ${{ steps.release.outputs.new_release_version }}
         run: |
           gh release edit "v${VERSION}" \
-            --repo "${REPO}" \
+            --repo ${{ github.repository }} \
             --notes "🐳 container image published: ghcr.io/${{ github.repository }}/${VERSION}"

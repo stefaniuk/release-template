@@ -19,6 +19,9 @@ This repository demonstrates a fully automated release workflow that moves code 
     - [🔏 Why we don't force tag signing by default](#-why-we-dont-force-tag-signing-by-default)
     - [📘 Why we don't commit a `CHANGELOG.md`](#-why-we-dont-commit-a-changelogmd)
     - [🐳 Use a flat registry for multiple images](#-use-a-flat-registry-for-multiple-images)
+      - [Why this pattern works](#why-this-pattern-works)
+      - [Alternative patterns considered](#alternative-patterns-considered)
+      - [Detailed configuration](#detailed-configuration)
   - [How to use this repository](#how-to-use-this-repository)
     - [Adding a new feature](#adding-a-new-feature)
     - [How Conventional Commits affect versioning](#how-conventional-commits-affect-versioning)
@@ -96,7 +99,6 @@ Follow these steps to create and configure a minimal‑permission GitHub App tha
      - Repository permissions:
        - _Contents: Read & write_, needed to create tags and commit `VERSION`
        - _Issues: Read & write_, enables adding release notes comments
-       - _Pull requests: Read & write_, allows future PR commenting automation
        - All other repository permissions: No access
      - _Organization permissions: None required_
      - _Account permissions: None required_
@@ -193,43 +195,35 @@ If an on-disk changelog is ever needed (e.g. for packaged distributions), re-ena
 
 ### 🐳 Use a flat registry for multiple images
 
-When a single repository produces multiple container images (for example, api, ui, or cli), GitHub’s Container Registry (GHCR) imposes certain structural and permission constraints on how those images can be stored and tagged. Key points and reasoning:
+When a single repository produces multiple container images, for example `api` or `ui`, GitHub's Container Registry (GHCR) imposes certain structural and permission constraints on how those images can be stored and tagged. Key points and reasoning:
 
-- GitHub App tokens cannot publish to GHCR, app installation tokens do not have package-level permissions for container publishing. To push images, use the built-in `GITHUB_TOKEN` instead, which automatically grants write access to your repository's package namespace
-- Registry scope is flat, the `GITHUB_TOKEN` can only push images to the registry path matching the repository's namespace e.g. ghcr.io/owner/repo. Nested namespaces like ghcr.io/owner/repo/api are not permitted when authenticating via `GITHUB_TOKEN`
-- Use tag naming to distinguish components, since subpaths are unavailable, encode the component name and version together in the tag. The recommended convention is component-version, for example `ghcr.io/org/repo:api-1.2.3`
-- Why this pattern works
-  - Flat structure compatible with GHCR permissions and the default `GITHUB_TOKEN`
-  - Aligns with common multi-image tagging practices `nginx:alpine-1.25`, `python:3.12-slim`
-  - Simple to automate, the same semantic version applies across components
-  - Easy to query, filter, and sort by component prefix e.g. `api-*`
-- Alternative patterns - other semver-valid formats such as `1.2.3+api` or `api_v1.2.3` were evaluated, but `api-1.2.3` offers the best portability, readability, and compatibility with container image tooling and CI pipelines
+- GitHub App tokens cannot publish to GHCR, app installation tokens do not carry package-level permissions for container publishing. To push images, use the built-in `${{ github.token }}` (not `${{ secrets.GITHUB_TOKEN }}`), which automatically grants write access to your repository's package namespace
+- Registry scope is flat, the `${{ github.token }}` can only publish to the registry path matching the repository's namespace by default, e.g. `ghcr.io/owner/repo`. Nested namespaces such as `ghcr.io/owner/repo/api` are not permitted when authenticating with `${{ github.token }}`
+- Use tag naming to distinguish components, since subpaths are unavailable, encode both the component name and the version in the image tag. The recommended convention is `<component>-<version>`, for example `ghcr.io/org/repo:api-1.2.3`
 
-TODO:
+#### Why this pattern works
 
-- Does the first version of the image has to be pushed using PAT to create the namespace? (no, it was created automaticly!) so there are things to ensure:
-  - Package registry has to be connected to the repository explicitly in the settings
-  - In the _Manage Actions access_ ensure that the repository is on the list
-  - Tick _Inherit access from source repository (recommended)_
-  - Visability of the package has to match the repository vvisability
-- Does it still require App to have Package write permission?
-  - Currnet access: Read access to metadata & Read and write access to code, issues, and packages
-  - Droped the package registry and expexcted this to still work (re-creaet automaticly)
-- `packages: write` (is required)
-  - removed package app access -> set to none, it still worked
-  - Droped the package registry and expexcted this to still work (re-creaet automaticly)
-- Do not use ${{ secrets.GITHUB_TOKEN }}, favour ${{ github.token }} instead, Built-in, ephemeral token automatically provided to every workflow run
-  - Droped the package registry and expexcted this to still work (re-creaet automaticly)
-- Go to your repo → Settings → Actions → General (turning that off)
-  - Scroll to Workflow permissions
-    Enable:
-    ✅ “Read and write permissions”
-    ✅ “Allow GitHub Actions to create and approve pull requests”
-  - Droped the package registry and expexcted this to still work (re-creaet automaticly)
+- Flat structure, fully compatible with GHCR permissions and the default `${{ github.token }}`
+- Established precedent, aligns with common multi-variant image naming, e.g. `nginx:alpine-1.25`, `python:3.12-slim`
+- Automation-friendly, uses a shared semantic version across all components
+- Discoverable, easy to query, filter, and sort by component prefix `api-*`, `ui-*`, etc.
 
-👆 which of these?
+#### Alternative patterns considered
 
-This _"flat registry with tagged components"_ model scales cleanly across repositories while staying compliant with GitHub's authentication and namespace rules.
+Other semver-valid formats such as `1.2.3+api` or `api_v1.2.3` were evaluated, but `api-1.2.3` offers the best balance of portability, readability, and compatibility with container tooling and CI/CD pipelines.
+
+#### Detailed configuration
+
+- The repository's package registry entry is created automatically when the first image is published. You should not need to create it manually. Once created, confirm that:
+  - The package is explicitly linked to the repository
+  - Under _Manage Actions access_, the repository appears in the list and the Role is set to Admin
+  - _Inherit access from source repository_ is enabled
+  - The package visibility matches the repository's visibility (private or public)
+- The GitHub App used for releases does not require Packages accessas that capability comes from the ephemeral ${{ github.token }} used inside the workflow
+- However, the workflow itself must request the correct token scopes which must include `packages: write`
+- Use `${{ github.token }}` instead of the legacy `${{ secrets.GITHUB_TOKEN }}`, the former is guaranteed to exist in all workflow contexts and is the modern standard
+
+This _"flat registry with tagged components"_ model scales cleanly across repositories while remaining compliant with GitHub's authentication and namespace rules. It also provides a consistent, human-readable way to publish and manage multiple container images under one project.
 
 ## How to use this repository
 
