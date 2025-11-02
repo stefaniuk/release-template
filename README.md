@@ -217,7 +217,9 @@ TODO:
     ✅ “Read and write permissions”
     ✅ “Allow GitHub Actions to create and approve pull requests”
 - ghcr.io/stefaniuk/dev-to-prod-fast change visability to match repo
-- registry connect repository
+- registry connect repository - <https://github.com/users/stefaniuk/packages/container/dev-to-prod-fast/settings>
+- Inherit access from source repository - <https://github.com/users/stefaniuk/packages/container/dev-to-prod-fast/settings>
+- Manage Actions access - <https://github.com/users/stefaniuk/packages/container/dev-to-prod-fast/settings>
 
 👆 which of these?
 
