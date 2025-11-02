@@ -219,6 +219,7 @@ TODO:
   - removed package app access -> set to none, it still worked
   - Droped the package registry and expexcted this to still work (re-creaet automaticly)
 - Do not use ${{ secrets.GITHUB_TOKEN }}, favour ${{ github.token }} instead, Built-in, ephemeral token automatically provided to every workflow run
+  - Droped the package registry and expexcted this to still work (re-creaet automaticly)
 
 ---
 
