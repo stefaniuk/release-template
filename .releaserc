@@ -51,7 +51,8 @@
         "assets": [
           "VERSION"
         ],
-        "message": "chore(release): ${nextRelease.version} [skip ci]"
+        "message": "chore(release): ${nextRelease.version} [skip ci]",
+        "author": "Dan Stefaniuk <daniel.stefaniuk@gmail.com>"
       }
     ],
     "@semantic-release/github"
