@@ -208,13 +208,15 @@ When a single repository produces multiple container images (for example, api, u
 TODO:
 
 - Does the first version of the image has to be pushed using PAT to create the namespace? (no, it was created automaticly!) so there are things to ensure:
-
   - Package registry has to be connected to the repository explicitly in the settings
   - In the _Manage Actions access_ ensure that the repository is on the list
   - Tick _Inherit access from source repository (recommended)_
   - Visability of the package has to match the repository vvisability
-
 - Does it still require App to have Package write permission?
+  - Currnet access: Read access to metadata & Read and write access to code, issues, and packages
+
+---
+
 - `packages: write`
 - ${{ github.token }} or ${{ secrets.GITHUB_TOKEN }}
 - Go to your repo → Settings → Actions → General
