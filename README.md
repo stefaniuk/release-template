@@ -142,8 +142,8 @@ Follow these steps to create and configure a minimal‑permission GitHub App tha
 TODO: [Create GPG key](https://github.com/nhs-england-tools/repository-template/blob/main/docs/user-guides/Sign_Git_commits.md)
 
 ```bash
-USER_NAME="Dan Stefaniuk" # must match
-USER_EMAIL="daniel.stefaniuk@gmail.com" # must match
+USER_NAME="Dan Stefaniuk" # must match GIT_SIGN_BOT_NAME
+USER_EMAIL="daniel.stefaniuk@gmail.com" # must match GIT_SIGN_BOT_EMAIL
 file=$USER_EMAIL
 mkdir -p "$HOME/.gnupg"
 chmod 0700 "$HOME/.gnupg"

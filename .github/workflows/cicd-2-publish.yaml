@@ -60,6 +60,7 @@ jobs:
             gpgconf --launch gpg-agent || true
             echo "warmup" | gpg --batch --yes --passphrase "$BOT_GPG_PASS" --pinentry-mode loopback --sign >/dev/null 2>&1 || true
           fi
+          gpg --list-secret-keys --keyid-format LONG
 
       - name: "Run release process"
         id: release
