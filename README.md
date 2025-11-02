@@ -210,7 +210,7 @@ TODO:
 - Does the first version of the image has to be pushed using PAT?
 - Does it still require App to have Package write permission?
 - `packages: write` (YES)
-- Go to your repo → Settings → Actions → General (YES)
+- Go to your repo → Settings → Actions → General (YES needed)
   - Scroll to Workflow permissions
     Enable:
     ✅ “Read and write permissions”
