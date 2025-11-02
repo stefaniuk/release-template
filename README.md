@@ -225,6 +225,7 @@ TODO:
     Enable:
     ✅ “Read and write permissions”
     ✅ “Allow GitHub Actions to create and approve pull requests”
+  - Droped the package registry and expexcted this to still work (re-creaet automaticly)
 
 👆 which of these?
 
