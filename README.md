@@ -216,6 +216,7 @@ TODO:
     Enable:
     ✅ “Read and write permissions”
     ✅ “Allow GitHub Actions to create and approve pull requests”
+- ghcr.io/stefaniuk/dev-to-prod-fast change visability to match repo
 
 👆 which of these?
 
