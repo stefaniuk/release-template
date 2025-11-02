@@ -209,14 +209,15 @@ TODO:
 
 - Does the first version of the image has to be pushed using PAT?
 - Does it still require App to have Package write permission?
-- `packages: write` (YES)
+- `packages: write`
 - ${{ github.token }} or ${{ secrets.GITHUB_TOKEN }}
-- Go to your repo → Settings → Actions → General (YES needed)
+- Go to your repo → Settings → Actions → General
   - Scroll to Workflow permissions
     Enable:
     ✅ “Read and write permissions”
     ✅ “Allow GitHub Actions to create and approve pull requests”
 - ghcr.io/stefaniuk/dev-to-prod-fast change visability to match repo
+- registry connect repository
 
 👆 which of these?
 
