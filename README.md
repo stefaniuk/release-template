@@ -207,7 +207,7 @@ When a single repository produces multiple container images (for example, api, u
 
 TODO:
 
-- Does the first version of the image has to be pushed using PAT?
+- Does the first version of the image has to be pushed using PAT to create the namespace? (CHECKING)
 - Does it still require App to have Package write permission?
 - `packages: write`
 - ${{ github.token }} or ${{ secrets.GITHUB_TOKEN }}
