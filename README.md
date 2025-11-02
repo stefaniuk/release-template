@@ -215,7 +215,7 @@ TODO:
 - Does it still require App to have Package write permission?
   - Currnet access: Read access to metadata & Read and write access to code, issues, and packages
   - Droped the package registry and expexcted this to still work (re-creaet automaticly)
-- `packages: write` (CHECKING)
+- `packages: write` (CHECKING) removed package app access -> set to none
 
 ---
 
