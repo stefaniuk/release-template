@@ -60,13 +60,6 @@ jobs:
             echo "warmup" | gpg --batch --yes --passphrase "$BOT_GPG_PASS" --pinentry-mode loopback --sign >/dev/null 2>&1 || true
           fi
 
-      - name: "Login to container registry"
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: "Run release process"
         id: release
         uses: cycjimmy/semantic-release-action@v4
@@ -78,6 +71,13 @@ jobs:
             conventional-changelog-conventionalcommits
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: "Login to container registry"
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
       - name: "Build and push container image"
         if: steps.release.outputs.new_release_published == 'true'
