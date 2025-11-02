@@ -82,13 +82,13 @@ jobs:
       - name: "Build and push container image"
         if: steps.release.outputs.new_release_published == 'true'
         env:
-          IMAGE_NAME: ghcr.io/${{ github.repository }}/app
+          IMAGE_NAME: ghcr.io/${{ github.repository }}
           VERSION: ${{ steps.release.outputs.new_release_version }}
         run: |
-          docker build -t ${IMAGE_NAME}:${VERSION} ./app
-          docker tag ${IMAGE_NAME}:${VERSION} ${IMAGE_NAME}:latest
-          docker push ${IMAGE_NAME}:${VERSION}
-          docker push ${IMAGE_NAME}:latest
+          docker build -t ${IMAGE_NAME}:app-${VERSION} ./app
+          docker tag ${IMAGE_NAME}:app-${VERSION} ${IMAGE_NAME}:app-latest
+          docker push ${IMAGE_NAME}:app-${VERSION}
+          docker push ${IMAGE_NAME}:app-latest
 
       - name: "Attach container image info to release notes"
         if: steps.release.outputs.new_release_published == 'true'
@@ -100,4 +100,4 @@ jobs:
           echo "Appending image info to GitHub release body..."
           gh release edit "v${VERSION}" \
             --repo "${REPO}" \
-            --notes "🐳 container image published: ghcr.io/${{ github.repository }}/app:${VERSION}"
+            --notes "🐳 container image published: ghcr.io/${{ github.repository }}/app-${VERSION}"
