@@ -104,6 +104,7 @@ jobs:
       - name: "🔏 Sign container image"
         if: steps.release.outputs.new_release_published == 'true'
         env:
+          COSIGN_PUBLIC_KEY: ${{ secrets.COSIGN_PUBLIC_KEY || secrets.NHS_COSIGN_PUBLIC_KEY }}
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY || secrets.NHS_COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD || secrets.NHS_COSIGN_PASSWORD }}
           IMAGE_NAME: ghcr.io/${{ github.repository }}
@@ -113,10 +114,11 @@ jobs:
           sudo mv cosign-linux-amd64 /usr/local/bin/cosign
           sudo chmod +x /usr/local/bin/cosign
           echo "$COSIGN_PRIVATE_KEY" > cosign.key
-          cosign sign --key cosign.key ${IMAGE_NAME}:app-${VERSION}
-          cosign verify --key cosign.key ${IMAGE_NAME}:app-${VERSION}
-          cosign sign --key cosign.key ${IMAGE_NAME}:app-latest
-          cosign verify --key cosign.key ${IMAGE_NAME}:app-latest
+          echo "$COSIGN_PUBLIC_KEY" > cosign.pub
+          cosign sign --key cosign.key --tlog-upload=true ${IMAGE_NAME}:app-${VERSION}
+          cosign verify --key cosign.pub ${IMAGE_NAME}:app-${VERSION}
+          cosign sign --key cosign.key --tlog-upload=true ${IMAGE_NAME}:app-latest
+          cosign verify --key cosign.pub ${IMAGE_NAME}:app-latest
 
       - name: "📝 Update release notes with image info"
         if: steps.release.outputs.new_release_published == 'true'
