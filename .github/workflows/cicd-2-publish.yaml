@@ -68,7 +68,7 @@ jobs:
 
       - name: "🚀 Run release process"
         id: release
-        uses: cycjimmy/semantic-release-action@v4
+        uses: cycjimmy/semantic-release-action@sha256:ba330626c4750c19d8299de843f05c7aa5574f62 # v5.0.2
         with:
           extra_plugins: |
             @semantic-release/git
