@@ -104,7 +104,7 @@ Repository secrets provide the credentials and cryptographic materials required 
 - `GIT_SIGNING_BOT_GPG_PRIVATE_KEY` - private signing key of your release bot
 - `GIT_SIGNING_BOT_GPG_PASSPHRASE` - the key passphrase
 
-All of the above variables and secrets has an organisation-wide
+All of the above variables and secrets have an organisation-wide equivalent managed centrally by the NHS GitHub Admins. These defaults are automatically available to all repositories, ensuring consistent configuration, simplified onboarding, and alignment with NHS engineering and security standards.
 
 ## Prerequisites
 
