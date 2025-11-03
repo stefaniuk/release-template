@@ -232,7 +232,7 @@ GitHub Action. Provenance describes what was built, how, and by whom - providing
 The workflow must request `id-token: write` and `attestations: write` permissions to create attestations. Provenance always references the immutable image digest (sha256:...), not version tags, to ensure traceability. Attestations can be viewed and verified with the GitHub CLI:
 
 ```bash
-gh attestation list ghcr.io/{{ repository }}@sha256:{{ digest }}
+cosign verify-attestation --key cosign.pub ghcr.io/{{ repository }}@sha256:{{ digest }}
 ```
 
 ## Design decisions and rationale
