@@ -1,6 +1,6 @@
 # 🚀 Release Template
 
-This repository demonstrates how to make modern, safe, and automated release easy to understand and adopt. It shows how any team can go from a manual, error-prone "version bump and tag" workflow to a fully automated release pipeline that handles versioning, tagging, changelogs, container publishing, and signing - all in a transparent and auditable way.
+This repository demonstrates how to make modern, safe, and automated releases easy to understand and adopt. It shows how any team can go from a manual, error-prone "version bump and tag" workflow to a fully automated release pipeline that handles versioning, tagging, changelogs, container publishing, and signing - all in a transparent and auditable way.
 
 The aim is to help engineering teams:
 
@@ -11,7 +11,7 @@ The aim is to help engineering teams:
 Whether you're a developer, tester, or tech lead, this repository shows how you can go from _commit → version → release → deploy_ without ever losing confidence in what's running in production.
 
 > [!IMPORTANT]
-> This repository is not intended to be used standalone. It should be built on top of and complement to the [NHS Repository Template](https://github.com/nhs-england-tools/repository-template), which defines the required baseline structure and configuration for all new repositories within the organisation.
+> This repository is not intended to be used standalone. It should be built on top of and complement the [NHS Repository Template](https://github.com/nhs-england-tools/repository-template), which defines the required baseline structure and configuration for all new repositories within the organisation.
 
 - [🚀 Release Template](#-release-template)
   - [Overview](#overview)
