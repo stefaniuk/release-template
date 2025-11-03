@@ -110,7 +110,7 @@ jobs:
             --repo ${{ github.repository }} \
             --json body \
             -q '.body')
-          updated_notes="${existing_notes}<br/><br/>🐳 Container image published to https://github.com/${{ github.repository }}/pkgs/container/${{ github.event.repository.name }}"
+          updated_notes="${existing_notes}<br/><br/>🐳 image published to [GitHub Container Registry](https://github.com/${{ github.repository }}/pkgs/container/${{ github.event.repository.name }})"
           # Update the release with the combined content
           gh release edit "v${VERSION}" \
             --repo ${{ github.repository }} \
