@@ -91,6 +91,7 @@ jobs:
           password: ${{ github.token }}
 
       - name: "🐳 Build and push container image"
+        id: build
         if: steps.release.outputs.new_release_published == 'true'
         env:
           IMAGE_NAME: ghcr.io/${{ github.repository }}
@@ -100,6 +101,8 @@ jobs:
           docker tag ${IMAGE_NAME}:app-${VERSION} ${IMAGE_NAME}:app-latest
           docker push ${IMAGE_NAME}:app-${VERSION}
           docker push ${IMAGE_NAME}:app-latest
+          digest=$(docker inspect --format='{{index .Id}}' ${IMAGE_NAME}:app-${VERSION})
+          echo "image-digest=${digest}" >> $GITHUB_OUTPUT
 
       - name: "🔏 Sign container image"
         if: steps.release.outputs.new_release_published == 'true'
@@ -119,6 +122,13 @@ jobs:
           cosign verify --key cosign.pub ${IMAGE_NAME}:app-${VERSION}
           cosign sign --key cosign.key --tlog-upload=true ${IMAGE_NAME}:app-latest
           cosign verify --key cosign.pub ${IMAGE_NAME}:app-latest
+
+      - name: "🧾 Generate build provenance"
+        if: steps.release.outputs.new_release_published == 'true'
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.build.outputs.image-digest }}
 
       - name: "📝 Update release notes with image info"
         if: steps.release.outputs.new_release_published == 'true'
