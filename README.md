@@ -35,6 +35,7 @@ This aligns directly with NHS ongoing work to strengthen the security posture of
     - [GitHub App setup](#github-app-setup)
     - [Bot setup for commit signing](#bot-setup-for-commit-signing)
     - [Container image signing with Cosign](#container-image-signing-with-cosign)
+    - [Build provenance attestation](#build-provenance-attestation)
   - [Design decisions and rationale](#design-decisions-and-rationale)
     - [🧩 Why use a GitHub App Token instead of a Personal Access Token (PAT)](#-why-use-a-github-app-token-instead-of-a-personal-access-token-pat)
     - [🔐 Why the signing key belongs to a bot, not the App](#-why-the-signing-key-belongs-to-a-bot-not-the-app)
@@ -217,6 +218,22 @@ The output confirms that:
 - the signature is recorded in the transparency log if enabled.
 
 This ensures that every deployment can be proven authentic and traceable, a core requirement for secure software supply-chain assurance within NHS.
+
+### Build provenance attestation
+
+To further strengthen software supply-chain assurance, this repository also demonstrates how to generate and publish build provenance attestations using the `actions/attest-build-provenance`
+GitHub Action. Provenance describes what was built, how, and by whom - providing cryptographic evidence that each artefact (for example, a container image) was produced by a trusted workflow. When enabled in the workflow, GitHub automatically creates an attestation record linked to the image digest. This record is cryptographically signed using the repository's OpenID Connect (OIDC) identity and stored securely within GitHub's Attestation store. Here are the benefits:
+
+- Verified origin, attests that an artefact was built by a specific repository and workflow run
+- Tamper resistance, signed using GitHub's OIDC token, ensuring authenticity and integrity
+- Auditable provenance, metadata such as build parameters, commit SHA, and workflow run ID are recorded immutably
+- Supply-chain compliance, aligns with [SLSA Level 2+](https://slsa.dev/spec/v1.0/levels) provenance standards
+
+The workflow must request `id-token: write` and `attestations: write` permissions to create attestations. Provenance always references the immutable image digest (sha256:...), not version tags, to ensure traceability. Attestations can be viewed and verified with the GitHub CLI:
+
+```bash
+gh attestation list ghcr.io/{{ repository }}@sha256:{{ digest }}
+```
 
 ## Design decisions and rationale
 
