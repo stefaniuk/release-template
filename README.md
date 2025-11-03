@@ -104,7 +104,7 @@ Repository secrets provide the credentials and cryptographic materials required 
 - `GIT_SIGNING_BOT_GPG_PRIVATE_KEY` - private signing key of your release bot
 - `GIT_SIGNING_BOT_GPG_PASSPHRASE` - the key passphrase
 
-All of the above variables and secrets has an orgnisation-wide
+All of the above variables and secrets has an organisation-wide
 
 ## Prerequisites
 
