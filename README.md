@@ -49,7 +49,7 @@ This aligns directly with NHS ongoing work to strengthen the security posture of
       - [CVE scanning](#cve-scanning)
     - [Container image signing](#container-image-signing)
     - [Build provenance attestation](#build-provenance-attestation)
-    - [End-to-End flow](#end-to-end-flow)
+    - [End-to-end flow](#end-to-end-flow)
   - [How to use this repository](#how-to-use-this-repository)
     - [Adding a new feature](#adding-a-new-feature)
     - [How Conventional Commits affect versioning](#how-conventional-commits-affect-versioning)
@@ -395,19 +395,7 @@ The workflow must request `id-token: write` and `attestations: write` permission
 cosign verify-attestation --key cosign.pub ghcr.io/{{ repository }}@sha256:{{ digest }}
 ```
 
-### End-to-End flow
-
-| **Stage**   | **Description**                                                                                                                                | **Tooling / Action**                  | **Outcome**                                                                 |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------- |
-| **Commit**  | Engineer merges a Conventional Commit to `main` or rather creates a Pull Request to accomplish it. The release bot signs commits automatically | GitHub App + GPG                      | Verified ✅ signed commit with authorship traceability                      |
-| **Version** | Semantic version is calculated automatically based on commit messages                                                                          | `semantic-release`                    | Predictable versioning (`v1.2.3`), changelog, and tag created               |
-| **Build**   | Application is packaged into a container image                                                                                                 | OCI container (aka Docker)            | Deterministic image tagged `app-<version>` and `app-latest`                 |
-| **Scan**    | Generate SBOM and CVE scan before release                                                                                                      | Syft + Grype                          | CycloneDX SBOM + CVE visibility for compliance and early risk detection     |
-| **Attest**  | Generate build provenance attestation linking code, build, and artefact digest                                                                 | `actions/attest-build-provenance`     | Cryptographically signed 🔏 provenance record stored in GitHub Attestations |
-| **Sign**    | Sign container image and record signature in the transparency log                                                                              | Sigstore Cosign + Rekor               | Tamper-evident signature proving authenticity and integrity                 |
-| **Publish** | Push signed, attested image to registry and update release notes                                                                               | GitHub Releases + GHCR                | Trusted artefact available for downstream consumption                       |
-| **Deploy**  | Change integrated with downstream environments up to production                                                                                | GitHub Action (continuous deployment) | TBC                                                                         |
-| **Release** | Feature enabled to the end user                                                                                                                | OpenFeature (feature toggling)        | TBC                                                                         |
+### End-to-end flow
 
 ```mermaid
 flowchart LR
@@ -431,6 +419,18 @@ flowchart LR
     class G,H audit
     class I release
 ```
+
+| **Stage**   | **Description**                                                                                                                                | **Tooling / Action**                  | **Outcome**                                                                 |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------- |
+| **Commit**  | Engineer merges a Conventional Commit to `main` or rather creates a Pull Request to accomplish it. The release bot signs commits automatically | GitHub App + GPG                      | Verified ✅ signed commit with authorship traceability                      |
+| **Version** | Semantic version is calculated automatically based on commit messages                                                                          | `semantic-release`                    | Predictable versioning (`v1.2.3`), changelog, and tag created               |
+| **Build**   | Application is packaged into a container image                                                                                                 | OCI container (aka Docker)            | Deterministic image tagged `app-<version>` and `app-latest`                 |
+| **Scan**    | Generate SBOM and CVE scan before release                                                                                                      | Syft + Grype                          | CycloneDX SBOM + CVE visibility for compliance and early risk detection     |
+| **Attest**  | Generate build provenance attestation linking code, build, and artefact digest                                                                 | `actions/attest-build-provenance`     | Cryptographically signed 🔏 provenance record stored in GitHub Attestations |
+| **Sign**    | Sign container image and record signature in the transparency log                                                                              | Sigstore Cosign + Rekor               | Tamper-evident signature proving authenticity and integrity                 |
+| **Publish** | Push signed, attested image to registry and update release notes                                                                               | GitHub Releases + GHCR                | Trusted artefact available for downstream consumption                       |
+| **Deploy**  | Change integrated with downstream environments up to production                                                                                | GitHub Action (continuous deployment) | TBC                                                                         |
+| **Release** | Feature enabled to the end user                                                                                                                | OpenFeature (feature toggling)        | TBC                                                                         |
 
 ## How to use this repository
 
