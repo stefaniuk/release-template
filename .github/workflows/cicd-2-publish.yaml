@@ -119,8 +119,8 @@ jobs:
         uses: anchore/scan-action@v7
         with:
           sbom: sbom-${{ github.event.repository.name }}-app-${{ steps.release.outputs.new_release_version }}.cdx.json
-          fail-build: false # change to true to block on CVEs
-          severity-cutoff: medium # ignore low and negligible
+          fail-build: false
+          severity-cutoff: medium
           only-fixed: true
           output-format: table
 
