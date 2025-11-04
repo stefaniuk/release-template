@@ -106,6 +106,31 @@ jobs:
           digest=$(docker inspect --format='{{index .Id}}' ${IMAGE_NAME}:app-${VERSION})
           echo "image-digest=${digest}" >> $GITHUB_OUTPUT
 
+      - name: "📦 Generate SBOM"
+        if: steps.release.outputs.new_release_published == 'true'
+        uses: anchore/sbom-action@v0
+        with:
+          image: ghcr.io/${{ github.repository }}:app-${{ steps.release.outputs.new_release_version }}
+          format: cyclonedx-json
+          output-file: sbom-${{ github.event.repository.name }}-app-${{ steps.release.outputs.new_release_version }}.cdx.json
+
+      - name: "🔍 Scan for CVEs"
+        if: steps.release.outputs.new_release_published == 'true'
+        uses: anchore/scan-action@v7
+        with:
+          sbom: sbom-${{ github.event.repository.name }}-app-${{ steps.release.outputs.new_release_version }}.cdx.json
+          fail-build: false # change to true to block on CVEs
+          severity-cutoff: medium # ignore low and negligible
+          only-fixed: true
+          output-format: table
+
+      - name: "📤 Upload SBOM artefact"
+        if: steps.release.outputs.new_release_published == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ steps.release.outputs.new_release_version }}-app
+          path: sbom-${{ github.event.repository.name }}-app-${{ steps.release.outputs.new_release_version }}.cdx.json
+
       - name: "🔏 Sign container image"
         if: steps.release.outputs.new_release_published == 'true'
         env:
